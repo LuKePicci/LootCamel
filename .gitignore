@@ -262,3 +262,6 @@ __pycache__/
 
 # default application settings
 /src/LootCamel/appsettings.json
+
+# local publish profiles
+/src/LootCamel/Properties/PublishProfiles
