@@ -261,4 +261,4 @@ __pycache__/
 *.pyc
 
 # default application settings
-src/appsettings.json
+/src/LootCamel/appsettings.json
