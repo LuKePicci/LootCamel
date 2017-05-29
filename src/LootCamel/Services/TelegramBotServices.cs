@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot.Types;
 using System.Text;
 using System.Security.Cryptography;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace LootCamel.Services
 {
@@ -44,6 +45,28 @@ namespace LootCamel.Services
         public async Task SendMuteTextMessage(long chatId, string text)
         {
             await this.tgapi.SendTextMessageAsync(chatId, text, false, true);
+        }
+
+        public InlineKeyboardMarkup Get1rKeyboardMarkup((string, string)[] buttons)
+        {
+            var markup = new InlineKeyboardMarkup();
+            markup.InlineKeyboard = new InlineKeyboardButton[1][];
+            markup.InlineKeyboard[0] = new InlineKeyboardButton[buttons.Length];
+
+            for (int i = 0; i < buttons.Length; i++)
+                markup.InlineKeyboard[0][i] = new InlineKeyboardButton(buttons[i].Item1, buttons[i].Item2);
+
+            return markup;
+        }
+
+        public async Task SendInlineKeyboardMessage(long chatId, string text, InlineKeyboardMarkup markup)
+        {            
+            await this.tgapi.SendTextMessageAsync(chatId, text, true, false, 0, markup);
+        }
+
+        public async Task AckCallbackQuery(string queryId)
+        {
+            await this.tgapi.AnswerCallbackQueryAsync(queryId, null, false, null, 120);
         }
     }
 }

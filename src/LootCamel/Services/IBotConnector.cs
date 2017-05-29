@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace LootCamel.Interfaces
 {
@@ -15,5 +16,8 @@ namespace LootCamel.Interfaces
         Task SendTextMessage(long chatId, string text,
             bool disableWebPagePreview = false, bool disableNotification = false);
         Task SendMuteTextMessage(long chatId, string text);
+        InlineKeyboardMarkup Get1rKeyboardMarkup((string, string)[] buttons);
+        Task SendInlineKeyboardMessage(long chatId, string text, InlineKeyboardMarkup markup);
+        Task AckCallbackQuery(string queryId);
     }
 }

@@ -42,64 +42,97 @@ namespace LootCamel.Controllers
 
             try
             {
-                if (upd.Type != UpdateType.MessageUpdate)
-                    return "Bho";
-
-                Message msg = upd.Message;
-
-                if (msg.Type == MessageType.TextMessage)
+                switch (upd.Type)
                 {
-                    // disallow forwarded commands
-                    if (msg.ForwardDate != null)
-                    {
-                        this.bot.SendMuteTextMessage(msg.Chat.Id, "Sorry, you can't forward commands");
-                        return "Forwarded";
-                    }
+                    case UpdateType.MessageUpdate:
+                        Message msg = upd.Message;
 
-                    string[] tokens = msg.Text.Split(' ');
+                        if (msg.Type == MessageType.TextMessage)
+                        {
+                            // disallow forwarded commands
+                            if (msg.ForwardDate != null)
+                            {
+                                this.bot.SendMuteTextMessage(msg.Chat.Id, "Sorry, you can't forward commands");
+                                return "Forwarded";
+                            }
 
-                    switch (tokens[0].ToLower())
-                    {
-                        case "/start":
-                            await this.startCommand(msg);
-                            break;
+                            return await this.routeMessage(msg);
+                        }
+                        else if (msg.Type == MessageType.PhotoMessage)
+                        {
+                            this.bot.SendMuteTextMessage(msg.Chat.Id, "Thx for the Pic");
+                            return "Pic";
+                        }
+                        return "Unmanaged message";
 
-                        case "/subscribe":
-                            await this.subscribeCommand(msg);
-                            break;
+                    case UpdateType.CallbackQueryUpdate:
+                        this.bot.AckCallbackQuery(upd.CallbackQuery.Id);
+                        return await this.routeCallback(upd.CallbackQuery);
 
-                        case "/subscriptions":
-                            // register new LootPlayer
-                            break;
-
-                        case "/unsubscribe":
-                            await this.unsubscribeCommand(msg);
-                            break;
-
-                        case "/help":
-                            await this.helpCommand(msg);
-                            break;
-
-                        case "/echo":
-                            // Echo each Message
-                            this.bot.Echo(msg);
-                            break;
-
-                        default:
-                            return "Bho";
-                    }
-                }
-                else if (msg.Type == MessageType.PhotoMessage)
-                {
-                    this.bot.SendMuteTextMessage(msg.Chat.Id, "Thx for the Pic");
+                    default:
+                        return "Unmanaged update";
                 }
 
-                return "Ok";
             }
             catch (Exception ex)
             {
                 return "fail";
             }
+        }
+
+        private async Task<string> routeMessage(Message msg)
+        {
+            string[] tokens = msg.Text.Split(' ');
+
+            switch (tokens[0].ToLower())
+            {
+                case "/start":
+                    await this.startCommand(msg);
+                    break;
+
+                case "/subscribe":
+                    await this.subscribeCommand(msg.From, msg.Text);
+                    break;
+
+                case "/subscriptions":
+                    // register new LootPlayer
+                    break;
+
+                case "/unsubscribe":
+                    await this.unsubscribeCommand(msg);
+                    break;
+
+                case "/help":
+                    await this.helpCommand(msg);
+                    break;
+
+                case "/echo":
+                    // Echo each Message
+                    this.bot.Echo(msg);
+                    break;
+
+                default:
+                    return "Bho";
+            }
+
+            return "Ok";
+        }
+
+        private async Task<string> routeCallback(CallbackQuery query)
+        {
+            string[] tokens = query.Data.Split(' ');
+
+            switch (tokens[0].ToLower())
+            {
+                case "/subscribe":
+                    await this.subscribeCommand(query.From, query.Data);
+                    break;
+
+                default:
+                    return "Bho";
+            }
+
+            return "Ok";
         }
 
         private async Task startCommand(Message msg)
@@ -129,16 +162,16 @@ namespace LootCamel.Controllers
             }
         }
 
-        private async Task subscribeCommand(Message msg)
+        private async Task subscribeCommand(User from, string content)
         {
             // parse the command
-            string[] tokens = msg.Text.Split(' ');
-            string itemName = msg.Text.Replace(tokens.First(), "").Replace(tokens.Last(), "").Trim();
+            string[] tokens = content.Split(' ');
+            string itemName = content.Replace(tokens.First(), "").Replace(tokens.Last(), "").Trim();
             int priceEvent;
 
             if(!int.TryParse(tokens.Last(), out priceEvent) || priceEvent < 1)
             {
-                this.bot.SendMuteTextMessage(msg.Chat.Id, "Sorry, last token must be a valid price");
+                this.bot.SendMuteTextMessage(from.Id, "Sorry, last token must be a valid price");
                 return;
             }
 
@@ -147,21 +180,21 @@ namespace LootCamel.Controllers
 
             if (item == null)
             {
-                this.bot.SendMuteTextMessage(msg.Chat.Id, "Sorry, I never seen this item, maybe it does not exist or has just been introduced or renamed");
+                this.bot.SendMuteTextMessage(from.Id, "Sorry, I've never seen this item before, maybe it does not exist or has just been introduced or renamed");
                 return;
             }
 
             // check price is above or equal to minimum base
             if(priceEvent < item.BasePrice)
             {
-                this.bot.SendMuteTextMessage(msg.Chat.Id, String.Format("Sorry, this item has a base price of {0}§, noboy will never sell ti for less", item.BasePrice));
+                this.bot.SendMuteTextMessage(from.Id, String.Format("Sorry, this item has a base price of {0}§, noboy will never sell ti for less", item.BasePrice));
                 return;
             }
 
             // insert a new subscription
-            await this.repo.AddSubscription(this.repo.CreateSubscription(item.ID, msg.From.Id, msg.Chat.Id, priceEvent));
+            await this.repo.AddSubscription(this.repo.CreateSubscription(item.ID, from.Id, from.Id, priceEvent));
             await this.repo.Commit();
-            this.bot.SendTextMessage(msg.Chat.Id, String.Format("Ok, I'll notify you if somebody puts a {0} on sale for {1}§ or less", itemName, priceEvent));
+            this.bot.SendTextMessage(from.Id, String.Format("Ok, I'll notify you as soon as I find a {0} on sale for {1}§ or less", itemName, priceEvent));
         }
  
         private async Task unsubscribeCommand(Message msg)
