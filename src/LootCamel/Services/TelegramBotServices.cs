@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using LootCamel.Interfaces;
-using Telegram.Bot;
+﻿using LootCamel.Interfaces;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
-using System.Text;
-using System.Security.Cryptography;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace LootCamel.Services

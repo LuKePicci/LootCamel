@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using LinqKit;
 using LootCamel.Interfaces;
 using LootCamel.Models;
 using Microsoft.EntityFrameworkCore;
-using LinqKit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LootCamel.Data
 {

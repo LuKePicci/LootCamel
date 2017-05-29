@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using LootCamel.Data;
+using LootCamel.Interfaces;
+using LootCamel.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using LootCamel.Data;
-using Microsoft.EntityFrameworkCore;
-using LootCamel.Interfaces;
-using LootCamel.Services;
 
 namespace LootCamel
 {

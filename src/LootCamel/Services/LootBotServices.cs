@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using LootCamel.Interfaces;
+﻿using LootCamel.Interfaces;
 using LootCamel.Models;
-using System.Net;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using Microsoft.Extensions.Options;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace LootCamel.Services
 {

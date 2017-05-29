@@ -1,11 +1,9 @@
-﻿using System;
+﻿using LootCamel.Interfaces;
+using LootCamel.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using LootCamel.Data;
-using LootCamel.Interfaces;
-using LootCamel.Models;
 
 namespace LootCamel.Controllers
 {

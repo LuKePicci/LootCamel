@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LootCamel.Models
+﻿namespace LootCamel.Models
 {
     public class Subscription
     {
