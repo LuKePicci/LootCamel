@@ -97,9 +97,14 @@ namespace LootCamel.Data
             return await this.context.Subscriptions.AsExpandable().Where(predicate).Include(s => s.Item).ToListAsync();
         }
 
-        public async Task<ICollection<Subscription>> GetSubscriptionsByLootPlayerId(long pid)
+        public async Task<ICollection<Subscription>> GetSubscriptionsByLootPlayerId(long pid, bool withItem = false)
         {
-            return await this.context.Subscriptions.Where(p => p.LootPlayerID == pid).ToListAsync();
+            var data = this.context.Subscriptions.Where(s => s.LootPlayerID == pid);
+
+            if (withItem)
+                data = data.Include(s => s.Item);
+
+            return await data.ToListAsync();
         }
 
         public Subscription CreateSubscription(int itemId, int playerId, long chatId, int priceEvent)

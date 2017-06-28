@@ -19,7 +19,7 @@ namespace LootCamel.Interfaces
         Task AddPlayer(LootPlayer player);
         
         Task<ICollection<Subscription>> GetFilteredSubscriptions(IDictionary<int, (int, long)> itemEvent);
-        Task<ICollection<Subscription>> GetSubscriptionsByLootPlayerId(long pid);
+        Task<ICollection<Subscription>> GetSubscriptionsByLootPlayerId(long pid, bool withItem = false);
         Subscription CreateSubscription(int itemId, int playerId, long chatId, int priceEvent);
         Task AddSubscription(Subscription newSub);
         void RemoveSubscriptions(ICollection<Subscription> toBeRemoved);

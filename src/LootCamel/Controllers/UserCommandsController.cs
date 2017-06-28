@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -93,7 +94,7 @@ namespace LootCamel.Controllers
                     break;
 
                 case "/subscriptions":
-                    // register new LootPlayer
+                    await this.subscriptionsCommand(msg);
                     break;
 
                 case "/unsubscribe":
@@ -145,7 +146,7 @@ namespace LootCamel.Controllers
                 string welcomeText = String.Format("Hi {0}, welcome to Loot Camel!\r\n" +
                     "I'll let you subscribe to price decrease events in any public LootBot market.\r\n" +
                     "See /help for commands description.", msg.From.Username);
-                this.bot.SendTextMessage(msg.Chat.Id, welcomeText);
+                this.bot.SendTextMessage(msg.From.Id, welcomeText);
             }
             else
             {
@@ -156,7 +157,7 @@ namespace LootCamel.Controllers
                     await this.repo.Commit();
                 }
 
-                this.bot.SendTextMessage(msg.Chat.Id, String.Format("Welcome back {0}!", msg.From.Username));
+                this.bot.SendTextMessage(msg.From.Id, String.Format("Welcome back {0}!", msg.From.Username));
             }
         }
 
@@ -195,11 +196,29 @@ namespace LootCamel.Controllers
             this.bot.SendTextMessage(from.Id, String.Format("Ok, I'll notify you as soon as I find a {0} on sale for {1}§ or less", itemName, priceEvent));
         }
  
+        private async Task subscriptionsCommand(Message msg)
+        {
+            var subCollection = await this.repo.GetSubscriptionsByLootPlayerId(msg.Chat.Id, true);
+
+            if (subCollection.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var sub in subCollection)
+                    sb.AppendFormat("> {0} {1}§\r\n", sub.Item.ItemName, sub.PriceEvent);
+
+                this.bot.SendMuteTextMessage(msg.From.Id, sb.ToString());
+            }
+            else
+            {
+                this.bot.SendMuteTextMessage(msg.From.Id, "I have no active subscriptions from you");
+            }
+        }
+
         private async Task unsubscribeCommand(Message msg)
         {
             this.repo.RemoveSubscriptions(await this.repo.GetSubscriptionsByLootPlayerId(msg.From.Id));
             await this.repo.Commit();
-            this.bot.SendMuteTextMessage(msg.Chat.Id, "Done, you're now subscribed to nothing! ");
+            this.bot.SendMuteTextMessage(msg.From.Id, "Done, you're now subscribed to nothing! ");
         }
 
         private async Task helpCommand(Message msg)
@@ -208,12 +227,14 @@ namespace LootCamel.Controllers
                 "/subscribe <item> <price>\r\n" +
                 "Subscribe to price decrease alert for an item when it is available for your target price or less\r\n" +
                 "Example: /subscribe Pozione Grande 3600\r\n\r\n" +
+                "/subscriptions\r\n" +
+                "Show all your active subscriptions\r\n\r\n" +
                 "/unsubscribe\r\n" +
                 "Delete all active subscriptions previously created\r\n\r\n" +
                 "/help\r\n" +
                 "Show this help";
 
-            this.bot.SendMuteTextMessage(msg.Chat.Id, helpText);
+            this.bot.SendMuteTextMessage(msg.From.Id, helpText);
         }
     }
 }
