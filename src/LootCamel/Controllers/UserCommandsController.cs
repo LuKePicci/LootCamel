@@ -14,11 +14,13 @@ namespace LootCamel.Controllers
     {
         private readonly IBotConnector bot;
         private readonly ILootCamelRepository repo;
+        private readonly IUserRegistrar registrar;
 
-        public UserCommandsController(IBotConnector bot, ILootCamelRepository repo)
+        public UserCommandsController(IBotConnector bot, ILootCamelRepository repo, IUserRegistrar registrar)
         {
             this.bot = bot;
             this.repo = repo;
+            this.registrar = registrar;
         }
 
         // GET: api/usercommands/registerwebhook
@@ -136,13 +138,12 @@ namespace LootCamel.Controllers
 
         private async Task startCommand(Message msg)
         {
-            var player = await this.repo.GetLootPlayerById(msg.From.Id);
+            var player = (await this.registrar.GetExistingUser(msg.From.Id));
 
             if (player == null)
             {
                 // register new LootPlayer
-                await this.repo.AddPlayer(this.repo.CreateLootPlayer(msg.From.Id, msg.From.Username));
-                await this.repo.CommitWithIdentities("LootPlayer");
+                await this.registrar.RegisterNewUser(msg.From.Id, msg.From.Username);
                 string welcomeText = String.Format("Hi {0}, welcome to Loot Camel!\r\n" +
                     "I'll let you subscribe to price decrease events in any public LootBot market.\r\n" +
                     "See /help for commands description.", msg.From.Username);
@@ -151,12 +152,7 @@ namespace LootCamel.Controllers
             else
             {
                 // update nickname if changed
-                if (player.Nickname != msg.From.Username)
-                {
-                    player.Nickname = msg.From.Username;
-                    await this.repo.Commit();
-                }
-
+                await this.registrar.UpdateRegisteredUser(player, msg.From.Username);
                 this.bot.SendTextMessage(msg.From.Id, String.Format("Welcome back {0}!", msg.From.Username));
             }
         }

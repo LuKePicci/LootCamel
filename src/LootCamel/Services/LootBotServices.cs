@@ -16,7 +16,7 @@ namespace LootCamel.Services
         private readonly IOptions<LootBotOptions> lootbotOptions;
         private ICollection<JsonLootItem> allItemsCache;
 
-        public string HookToken { get { return lootbotOptions.Value.HookToken; } }
+        public string HookToken { get { return lootbotOptions.Value.AccessToken; } }
 
         public LootBotServices(IOptions<LootBotOptions> lootbotOptions)
         {

@@ -47,12 +47,15 @@ namespace LootCamel
             // Here we add TelegramBotOption values and map them to relative class
             services.Configure<TelegramBotOptions>(Configuration.GetSection("TelegramBot"));
             services.Configure<LootBotOptions>(Configuration.GetSection("LootBot"));
+            services.Configure<FellowAccessOptions>(Configuration.GetSection("FellowAccess"));
 
             // Add application services.
-            services.AddTransient<IBotConnector, TelegramBotServices>();
+            services.AddTransient<IBotConnector, TelegramBotService>();
+            services.AddTransient<IUserRegistrar, UserManagementService>();
             services.AddTransient<ILootShopExplorer, LootBotServices>();
             services.AddTransient<ILootItemsSource, LootBotServices>();
-            services.AddTransient<IPriceNotifier, LootCamelServices>();
+            services.AddTransient<IPriceNotifier, PriceNotificationService>();
+            services.AddTransient<IPriceProvider, PriceHistoryService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

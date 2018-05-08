@@ -1,10 +1,9 @@
 ﻿namespace LootCamel
 {
-    public class TelegramBotOptions
+    public class TelegramBotOptions : RestrictedServiceOptions
     {
         public string ApiToken { get; set; }
         public string WebhookEndpoint { get; set; }
-        public string HookToken { get; set; }
     }
 
 }

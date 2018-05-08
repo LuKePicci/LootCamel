@@ -15,6 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Properties\PublishProfiles\LootCamel - Web Deploy %282%29.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="wwwroot\**\*;app_data\jobs\**\*.*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>

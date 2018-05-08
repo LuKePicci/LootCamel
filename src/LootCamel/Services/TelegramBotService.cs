@@ -7,14 +7,14 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace LootCamel.Services
 {
-    public class TelegramBotServices : IBotConnector
+    public class TelegramBotService : IBotConnector
     {
         private readonly TelegramBotClient tgapi;
         private readonly IOptions<TelegramBotOptions> tbotOptions;
 
-        public string HookToken { get { return tbotOptions.Value.HookToken; } } 
+        public string HookToken { get { return tbotOptions.Value.AccessToken; } } 
 
-        public TelegramBotServices(IOptions<TelegramBotOptions> tbotOptions)
+        public TelegramBotService(IOptions<TelegramBotOptions> tbotOptions)
         {
             this.tbotOptions = tbotOptions;
             this.tgapi = new TelegramBotClient(tbotOptions.Value.ApiToken);
@@ -22,7 +22,7 @@ namespace LootCamel.Services
 
         public async Task SetWebhookAsync()
         {
-            await this.tgapi.SetWebhookAsync(tbotOptions.Value.WebhookEndpoint + "/" + tbotOptions.Value.HookToken);
+            await this.tgapi.SetWebhookAsync(tbotOptions.Value.WebhookEndpoint + "/" + tbotOptions.Value.AccessToken);
         }
 
         public async Task Echo(Message msg)

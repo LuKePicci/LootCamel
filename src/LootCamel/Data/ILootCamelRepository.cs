@@ -1,4 +1,5 @@
 ﻿using LootCamel.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ namespace LootCamel.Interfaces
     public interface ILootCamelRepository
     {
         Task<ICollection<LootItem>> GetKnownLootItems();
+        Task<IDictionary<string, Int64>> GetItemsWithAveragePrice(int pricesPerItem);
         Task<LootItem> GetLootItemByName(string name);
         Task<ISet<LootItem>> CreateUnkownLootItems(ICollection<int> itemIdCollection);
         Task AddItems(ISet<LootItem> toBeSaved);

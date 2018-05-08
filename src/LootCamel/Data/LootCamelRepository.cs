@@ -29,6 +29,46 @@ namespace LootCamel.Data
             return await this.context.LootItems.ToListAsync();
         }
 
+        public class testdto
+        {
+            public int ID { get; set; }
+            public string ItemName { get; set; }
+            public string AvgPrice { get; set; }
+        }
+
+        public async Task<IDictionary<string, Int64>> GetItemsWithAveragePrice(int pricesPerItem)
+        {
+            //var query1 = from i in this.context.LootItems
+
+            //         let avgPrice =
+            //         (
+            //           from price in i.Prices
+            //           orderby price.Date descending
+            //           select price
+            //         ).Take(pricesPerItem).Average(x => x.Value)
+
+            //         select new { Item = i, AveragePrice = avgPrice };
+
+
+            var rdr = await context.Database.ExecuteSqlQueryAsync(
+                "SELECT dbo.LootItems.ID, dbo.LootItems.ItemName, AVG(CAST(dbo.Prices.Value AS BIGINT)) AS AvgPrice " +
+                "FROM dbo.LootItems JOIN dbo.Prices ON Prices.LootItemID = LootItems.ID " +
+                "WHERE dbo.Prices.ID IN(SELECT TOP 5 dbo.Prices.ID FROM dbo.Prices " +
+                "WHERE LootItemID = dbo.LootItems.ID " +
+                "ORDER BY dbo.Prices.ID desc) " +
+                "GROUP BY dbo.LootItems.ID, dbo.LootItems.ItemName");
+
+            var results = new Dictionary<string, Int64>();
+
+            while (rdr.DbDataReader.Read())
+                results.Add(
+                    (string)(rdr.DbDataReader[1]),
+                    (Int64)(rdr.DbDataReader[2])
+                    );
+
+            return results;
+        }
+
         public async Task<LootItem> GetLootItemByName(string name)
         {
             return await this.context.LootItems.Where(i => i.ItemName == name).Include(i => i.Subscriptions).SingleOrDefaultAsync();
@@ -39,7 +79,7 @@ namespace LootCamel.Data
             var knownIds = (await this.getItemsById(itemIdCollection)).Select(item => item.ID);
             IList<int> unknownIds = itemIdCollection.Where(id => !knownIds.Contains(id)).ToList();
             ISet<LootItem> newItems = new HashSet<LootItem>();
-            foreach(int id in unknownIds)
+            foreach (int id in unknownIds)
             {
                 LootItem newItem = new LootItem() { ID = id };
                 newItems.Add(newItem);
@@ -67,6 +107,8 @@ namespace LootCamel.Data
         {
             await this.context.AddRangeAsync(pricesToAdd);
         }
+
+
 
         public async Task<LootPlayer> GetLootPlayerById(int id)
         {

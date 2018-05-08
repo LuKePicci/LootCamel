@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace LootCamel.Services
 {
-    public class LootCamelServices : IPriceNotifier
+    public class PriceNotificationService : IPriceNotifier
     {
         private readonly IBotConnector bot;
 
-        public LootCamelServices(IBotConnector bot)
+        public PriceNotificationService(IBotConnector bot)
         {
             this.bot = bot;
         }
